@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Forecaster Pro Dashboard{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Ambient Master-Level Background for the App */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 40% 60%, rgba(56, 189, 248, 0.06) 0%, transparent 50%),
+                        radial-gradient(circle at 60% 40%, rgba(192, 132, 252, 0.06) 0%, transparent 50%);
+            animation: rotateAmbient 60s linear infinite;
+            z-index: -10;
+            pointer-events: none;
+        }
+        @keyframes rotateAmbient {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        /* Sidebar enhancements */
+        .sidebar {
+            background: rgba(15, 23, 42, 0.6) !important;
+            backdrop-filter: blur(20px) !important;
+        }
+    </style>
+</head>
+<body>
+
+    {% if user.is_authenticated %}
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar glass-panel" style="border-radius: 0; border: none; border-right: 1px solid var(--panel-border);">
+            <div class="sidebar-brand">
+                <span class="text-gradient" style="font-size: 1.8rem;">Forecaster Pro</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <i class="ph ph-squares-four" style="margin-right: 12px; font-size: 1.2rem;"></i> Dashboard
+                </a>
+                <a href="{% url 'product_list' %}" class="{% if request.resolver_match.url_name == 'product_list' %}active{% endif %}">
+                    <i class="ph ph-package" style="margin-right: 12px; font-size: 1.2rem;"></i> Products
+                </a>
+                <a href="{% url 'sales_list' %}" class="{% if request.resolver_match.url_name == 'sales_list' %}active{% endif %}">
+                    <i class="ph ph-currency-inr" style="margin-right: 12px; font-size: 1.2rem;"></i> Sales Data
+                </a>
+                <a href="{% url 'forecast' %}" class="{% if request.resolver_match.url_name == 'forecast' %}active{% endif %}">
+                    <i class="ph ph-trend-up" style="margin-right: 12px; font-size: 1.2rem;"></i> Forecast AI
+                </a>
+                <a href="{% url 'insights' %}" class="{% if request.resolver_match.url_name == 'insights' %}active{% endif %}">
+                    <i class="ph ph-lightbulb" style="margin-right: 12px; font-size: 1.2rem;"></i> Insights
+                </a>
+            </nav>
+            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--panel-border);">
+                <div style="margin-bottom: 16px; padding: 0 16px;">
+                    <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">User</div>
+                    <div style="font-weight: 600; color: var(--neon-blue);">{{ user.username }}</div>
+                </div>
+                <form action="{% url 'logout' %}" method="post" style="padding: 0 16px;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary" style="width: 100%; text-align: left; background: rgba(248, 113, 113, 0.1); border-color: rgba(248, 113, 113, 0.2); color: var(--neon-red);">
+                        <i class="ph ph-sign-out" style="margin-right: 12px;"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+    {% else %}
+        <!-- For Unauthenticated users (Landing, Login, Register) -->
+        {% if messages %}
+            <div style="position: absolute; top: 20px; right: 20px; z-index: 1000;">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% block standalone %}
+        {% endblock %}
+    {% endif %}
+
+    {% block scripts %}
+    {% endblock %}
+</body>
+</html>

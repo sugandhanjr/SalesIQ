@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Forecast AI - SmartSales Forecast{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="text-gradient" style="margin-bottom: 8px;">AI Sales Forecasting</h1>
+        <p style="color: var(--text-muted);">Predictive analysis for the next 30 days</p>
+    </div>
+    <form method="post" action="{% url 'trigger_forecast' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary"><i class="ph ph-magic-wand"></i> Refresh Forecast</button>
+    </form>
+</div>
+
+<div class="dashboard-grid" style="margin-bottom: 24px;">
+    <div class="glass-panel kpi-card">
+        <div>
+            <div class="kpi-title">Projected Revenue (30d)</div>
+            <div class="kpi-value text-success">₹{{ predicted_sales|floatformat:2 }}</div>
+        </div>
+        <div class="kpi-icon text-success">
+            <i class="ph ph-trend-up"></i>
+        </div>
+    </div>
+    <div class="glass-panel kpi-card">
+        <div>
+            <div class="kpi-title">Model Confidence</div>
+            <div class="kpi-value" style="color: var(--neon-blue);">85%</div>
+        </div>
+        <div class="kpi-icon" style="color: var(--neon-blue);">
+            <i class="ph ph-shield-check"></i>
+        </div>
+    </div>
+</div>
+
+<div class="glass-panel" style="margin-bottom: 32px;">
+    <h3 style="margin-bottom: 24px; color: var(--text-muted);">30-Day Predictive Trend</h3>
+    <div class="chart-container">
+        <canvas id="forecastChart"></canvas>
+    </div>
+</div>
+
+<div class="glass-panel">
+    <h3 style="margin-bottom: 16px; color: var(--text-muted);">Detailed Forecast Data</h3>
+    <div class="table-wrapper" style="max-height: 300px; overflow-y: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Prediction Date</th>
+                    <th>Expected Revenue (₹)</th>
+                    <th>Confidence</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in forecasts %}
+                <tr>
+                    <td>{{ f.prediction_date|date:"M d, Y" }}</td>
+                    <td style="font-weight: 500; color: var(--neon-blue);">₹{{ f.predicted_sales|floatformat:2 }}</td>
+                    <td>{{ f.confidence_score|floatformat:1 }}%</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="text-align: center; color: var(--text-muted);">No forecast data available. Click "Refresh Forecast" to generate.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{{ forecasts_labels|json_script:"forecast-labels" }}
+{{ forecasts_data|json_script:"forecast-data" }}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const labels = JSON.parse(document.getElementById('forecast-labels').textContent);
+    const data = JSON.parse(document.getElementById('forecast-data').textContent);
+    const ctx = document.getElementById('forecastChart').getContext('2d');
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(192, 132, 252, 0.4)');
+    gradient.addColorStop(1, 'rgba(192, 132, 252, 0)');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Predicted Sales (₹)',
+                data: data,
+                borderColor: '#c084fc',
+                backgroundColor: gradient,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 2,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: '#94a3b8', callback: f => '₹' + f }
+                },
+                x: {
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: '#94a3b8', maxTicksLimit: 10 }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

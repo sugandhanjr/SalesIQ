@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}SmartSales Forecast - AI Sales Intelligence{% endblock %}
+
+{% block standalone %}
+<style>
+    .hero {
+        min-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        padding-top: 80px;
+    }
+    .hero-bg-glow {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background: radial-gradient(circle at 20% 30%, rgba(56, 189, 248, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(192, 132, 252, 0.15) 0%, transparent 50%);
+        z-index: -1;
+        filter: blur(60px);
+        animation: pulseGlow 10s ease-in-out infinite alternate;
+    }
+    @keyframes pulseGlow {
+        0% { opacity: 0.6; transform: scale(1); }
+        100% { opacity: 1; transform: scale(1.05); }
+    }
+    .hero h1 {
+        font-size: clamp(3rem, 8vw, 5rem);
+        font-weight: 800;
+        margin-bottom: 24px;
+        line-height: 1.1;
+        letter-spacing: -2px;
+    }
+    .portal-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 32px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 60px 24px;
+    }
+    .portal-card {
+        padding: 40px 32px;
+        text-align: center;
+        background: rgba(30, 41, 59, 0.4);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .portal-card:hover {
+        background: rgba(30, 41, 59, 0.8);
+        border-color: var(--neon-blue);
+    }
+    .portal-icon {
+        font-size: 3.5rem;
+        margin-bottom: 24px;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+    }
+    nav.top-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 20px 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1000;
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--panel-border);
+    }
+    .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 16px;
+        font-weight: 800;
+    }
+    .section-subtitle {
+        text-align: center;
+        color: var(--text-muted);
+        margin-bottom: 60px;
+        font-size: 1.2rem;
+    }
+</style>
+
+<nav class="top-nav">
+    <div class="sidebar-brand" style="margin-bottom: 0;">
+        <span class="text-gradient" style="font-size: 1.8rem;">Forecaster Pro</span>
+    </div>
+    <div>
+        {% if user.is_authenticated %}
+            <a href="{% url 'home' %}" class="btn btn-primary">Go to Console</a>
+        {% else %}
+            <a href="{% url 'login' %}" style="margin-right: 32px; color: var(--text-main); font-weight: 600;">Sign In</a>
+            <a href="{% url 'register' %}" class="btn btn-primary">DEMO</a>
+        {% endif %}
+    </div>
+</nav>
+
+<section class="hero bg-animate">
+    <div class="hero-bg-glow"></div>
+    <div class="badge badge-medium slide-up" style="margin-bottom: 32px; padding: 10px 20px; font-size: 0.9rem; border-radius: 100px;">
+        ✨ Unified AI Sales Platform
+    </div>
+    <h1 class="slide-up delay-1">One Platform.<br> <span class="text-gradient">Total Control.</span></h1>
+    <p class="slide-up delay-2" style="font-size: 1.4rem; max-width: 700px; color: var(--text-muted); margin-bottom: 48px;">
+        Access all your sales metrics, AI inventory forecasts, and pricing insights from a single unified portal. 
+    </p>
+    
+    <div class="slide-up delay-3">
+        {% if user.is_authenticated %}
+            <a href="{% url 'home' %}" class="btn btn-primary" style="padding: 18px 40px; font-size: 1.2rem;">Back to Dashboard</a>
+        {% else %}
+            <a href="{% url 'register' %}" class="btn btn-primary" style="padding: 18px 40px; font-size: 1.2rem;">Get Started Now</a>
+        {% endif %}
+    </div>
+</section>
+
+<section style="padding: 120px 0; background: #0f172a;">
+    <h2 class="section-title fade-in">Unified Project Hub</h2>
+    <p class="section-subtitle fade-in">Everything you need, accessible from this single link.</p>
+    
+    <div class="portal-grid">
+        <a href="{% url 'dashboard' %}" class="card-link fade-in delay-1">
+            <div class="glass-panel portal-card">
+                <i class="ph ph-layout portal-icon"></i>
+                <h3>Main Dashboard</h3>
+                <p style="color: var(--text-muted); margin-top: 12px;">Real-time overview of your business health and primary KPIs.</p>
+            </div>
+        </a>
+        
+        <a href="{% url 'forecast' %}" class="card-link fade-in delay-2">
+            <div class="glass-panel portal-card" style="border-color: rgba(192, 132, 252, 0.3);">
+                <i class="ph ph-lightning portal-icon" style="color: var(--neon-purple)"></i>
+                <h3>AI Forecasting</h3>
+                <p style="color: var(--text-muted); margin-top: 12px;">Next-gen ML models predicting your future demand with precision.</p>
+            </div>
+        </a>
+
+        <a href="{% url 'insights' %}" class="card-link fade-in delay-3">
+            <div class="glass-panel portal-card" style="border-color: rgba(74, 222, 128, 0.3);">
+                <i class="ph ph-chart-line-up portal-icon" style="color: var(--neon-green)"></i>
+                <h3>Strategic Insights</h3>
+                <p style="color: var(--text-muted); margin-top: 12px;">Explainable AI that tells you *why* trends are moving and what to do.</p>
+            </div>
+        </a>
+
+        <a href="{% url 'sales_list' %}" class="card-link fade-in" style="animation-delay: 0.8s;">
+            <div class="glass-panel portal-card">
+                <i class="ph ph-database portal-icon" style="color: var(--neon-blue)"></i>
+                <h3>Data Management</h3>
+                <p style="color: var(--text-muted); margin-top: 12px;">Comprehensive access to your historical sales records and logs.</p>
+            </div>
+        </a>
+    </div>
+</section>
+
+<footer style="padding: 60px 0; border-top: 1px solid var(--panel-border); text-align: center; color: var(--text-muted);">
+    <p>&copy; 2026 Forecaster Pro Inc. Master-Level Intelligence Platform.</p>
+</footer>
+{% endblock %}

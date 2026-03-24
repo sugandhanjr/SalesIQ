@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account - SmartSales Forecast{% endblock %}
+
+{% block standalone %}
+<div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative;">
+    <div class="glass-panel" style="width: 100%; max-width: 400px; padding: 40px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+            <h2 class="text-gradient" style="font-size: 2rem;">Get Started</h2>
+            <p style="color: var(--text-muted);">Create your business account</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-control" required>
+                    {% if field.errors %}
+                        <div style="color: var(--neon-red); font-size: 0.85rem; margin-top: 4px;">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">Create Account</button>
+        </form>
+
+        <div style="text-align: center; margin-top: 24px; color: var(--text-muted); font-size: 0.9rem;">
+            Already have an account? <a href="{% url 'login' %}">Sign in</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - SmartSales Forecast{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="text-gradient" style="margin-bottom: 8px;">Business Analytics</h1>
+        <p style="color: var(--text-muted);">Real-time Insights and AI Predictions</p>
+    </div>
+    <div>
+        <form method="post" action="{% url 'trigger_forecast' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary"><i class="ph ph-magic-wand" style="margin-right: 8px;"></i>
+                Generate Forecast</button>
+        </form>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div class="glass-panel kpi-card">
+        <div>
+            <div class="kpi-title">Total Sales Revenue</div>
+            <div class="kpi-value">₹{{ total_sales|floatformat:2 }}</div>
+        </div>
+        <div class="kpi-icon" style="color: var(--neon-blue);">
+            <i class="ph ph-currency-inr"></i>
+        </div>
+    </div>
+
+    <div class="glass-panel kpi-card">
+        <div>
+            <div class="kpi-title">Predicted Next Month</div>
+            <div class="kpi-value text-success">₹{{ predicted_sales|floatformat:2 }}</div>
+        </div>
+        <div class="kpi-icon text-success">
+            <i class="ph ph-trend-up"></i>
+        </div>
+    </div>
+
+    <div class="glass-panel kpi-card">
+        <div>
+            <div class="kpi-title">Inventory Risk</div>
+            <div class="kpi-value text-danger">High</div>
+        </div>
+        <div class="kpi-icon text-danger">
+            <i class="ph ph-warning-circle"></i>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 32px;">
+    <div class="glass-panel">
+        <h3 style="margin-bottom: 24px; color: var(--text-muted);">Sales Trend Analysis</h3>
+        <div class="chart-container">
+            <canvas id="salesChart"></canvas>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h3 style="margin: 0; color: var(--text-muted);">AI Tips</h3>
+            <a href="{% url 'insights' %}" style="font-size: 0.8rem; text-transform: uppercase;">View All</a>
+        </div>
+        {% for rec in recommendations %}
+        <div class="rec-card border-{{ rec.priority|lower }}" style="padding: 12px; margin-bottom: 8px;">
+            <div style="font-size: 0.9rem;">{{ rec.recommendation_text|truncatechars:80 }}</div>
+        </div>
+        {% empty %}
+        <p style="color: var(--text-muted);">No tips found.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="glass-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="margin: 0; color: var(--text-muted);">Latest Insights</h3>
+        <a href="{% url 'insights' %}" style="font-size: 0.8rem; text-transform: uppercase;">Manage Insights</a>
+    </div>
+    <div class="table-wrapper" style="max-height: 200px;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Explanation</th>
+                    <th>Key Factors</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for insight in insights %}
+                <tr>
+                    <td>{{ insight.explanation|truncatechars:100 }}</td>
+                    <td><span class="badge badge-medium">{{ insight.influencing_factors }}</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" style="text-align: center; color: var(--text-muted);">No insights available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const ctx = document.getElementById('salesChart').getContext('2d');
+
+    // Sample data configuration for visuals
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(56, 189, 248, 0.5)');
+    gradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Next Wk', 'Wk +2'],
+            datasets: [{
+                label: 'Actual Sales (₹)',
+                data: [12500, 19000, 15000, 22000, null, null],
+                borderColor: '#38bdf8',
+                backgroundColor: gradient,
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }, {
+                label: 'Forecasted (₹)',
+                data: [null, null, null, 22000, 25000, 28000],
+                borderColor: '#c084fc',
+                borderDash: [5, 5],
+                borderWidth: 2,
+                fill: false,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#94a3b8' }
+                }
+            },
+            scales: {
+                y: {
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: '#94a3b8', callback: function (value) { return '₹' + value; } }
+                },
+                x: {
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: '#94a3b8' }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

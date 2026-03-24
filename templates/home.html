@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Home - SmartSales Forecast{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="text-gradient" style="margin-bottom: 8px;">Welcome, {{ user.username }}</h1>
+        <p style="color: var(--text-muted);">Here's an overview of your business.</p>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <a href="{% url 'dashboard' %}" class="card-link">
+        <div class="glass-panel text-center" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height: 100%;">
+            <i class="ph ph-squares-four" style="font-size: 3rem; color: var(--neon-blue); margin-bottom: 16px;"></i>
+            <h3 style="margin-bottom: 8px;">View Dashboard</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Analyze your sales and predictions</p>
+        </div>
+    </a>
+    <a href="{% url 'product_list' %}" class="card-link">
+        <div class="glass-panel text-center" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height: 100%;">
+            <i class="ph ph-package" style="font-size: 3rem; color: var(--neon-purple); margin-bottom: 16px;"></i>
+            <h3 style="margin-bottom: 8px;">Manage Products</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Add or update inventory and pricing</p>
+        </div>
+    </a>
+    <a href="{% url 'sales_list' %}" class="card-link">
+        <div class="glass-panel text-center" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height: 100%;">
+            <i class="ph ph-currency-inr" style="font-size: 3rem; color: var(--neon-green); margin-bottom: 16px;"></i>
+            <h3 style="margin-bottom: 8px;">Record Sales</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Track your historical sales data</p>
+        </div>
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Business Insights - SmartSales Forecast{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="text-gradient" style="margin-bottom: 8px;">Intelligence Center</h1>
+        <p style="color: var(--text-muted);">Actionable insights and AI recommendations</p>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+    <!-- Insights Column -->
+    <div class="glass-panel">
+        <h3 style="margin-bottom: 24px;"><i class="ph ph-lightbulb" style="color: var(--neon-blue); margin-right: 12px;"></i> Explainable Insights</h3>
+        <div style="max-height: 500px; overflow-y: auto;">
+            {% for insight in insights %}
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">{{ insight.created_at|date:"M d, Y" }}</div>
+                <div style="font-size: 1.1rem; margin-bottom: 12px; font-weight: 500;">{{ insight.explanation }}</div>
+                <span class="badge badge-medium">Factor: {{ insight.influencing_factors }}</span>
+            </div>
+            {% empty %}
+            <p style="color: var(--text-muted);">No insights generated yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Recommendations Column -->
+    <div class="glass-panel">
+        <h3 style="margin-bottom: 24px;"><i class="ph ph-rocket-launch" style="color: var(--neon-purple); margin-right: 12px;"></i> Strategic Advice</h3>
+        <div style="max-height: 500px; overflow-y: auto;">
+            {% for rec in recommendations %}
+            <div class="rec-card border-{{ rec.priority|lower }}" style="margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span class="badge {% if rec.priority == 'HIGH' %}badge-high{% elif rec.priority == 'MEDIUM' %}badge-medium{% else %}badge-low{% endif %}">
+                        {{ rec.get_priority_display }} Priority
+                    </span>
+                    <small style="color: var(--text-muted);">{{ rec.generated_date|date:"M d" }}</small>
+                </div>
+                <div style="font-size: 1rem; line-height: 1.6;">{{ rec.recommendation_text }}</div>
+            </div>
+            {% empty %}
+            <p style="color: var(--text-muted);">No recommendations available.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
